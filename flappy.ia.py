@@ -117,13 +117,25 @@ class Pipe: #criando os canos
     def draw(self, win):
         win.blit(self.PIPE_TOP, (self.x, self.top)) #desenha no topo
         win.blit(self.PIPE_BOTTOM, (self.x, self.bottom)) #desenha embaixo
-        
     
+    #colisão cmo os canos
+    def collide (self, bird):
+        bird_mask = bird.get_mask() #mascaras de pixels
+        top_mask = pygame.mask.from_surface(self.PIPE_TOP)
+        bottom_mask = pygame.mask.from_surface(self.PIPE_BOTTOM)
         
+        top_offset = (self.x - bird.x, self.top - round(bird.y))
+        bottom_offset = (self.x - bird.x, self.bottom - round(bird.y))
         
+        b_point = bird_mask.overlap(bottom_mask, bottom_offset)
+        t_point = bird_mask.overlap(top_mask, top_offset)
         
+        if t_point or b_point:
+            return True
         
-        
+        return False
+    
+    
 #função para rotacionar a imagem              
 def blitRotateCenter(surf, image, topleft, angle):
     rotated_image = pygame.transform.rotate(image, angle)
