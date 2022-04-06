@@ -186,8 +186,8 @@ def draw_window(win, bird, pipes, base, score):
     bird.draw(win)
     pygame.display.update()
  
-def main():
-    bird = Bird(230,350)
+def main(genomes, config):
+    birds = []
     base = Base(730)
     pipes = [Pipe(600)] #altera distancia entre os canos
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -203,16 +203,17 @@ def main():
         #bird.move()
         add_pipe = False
         rem = []
-        for pipe in pipes: #cria o laço principal dos pipes
-            if pipe.collide(bird):
-                pass #adicionar o que acontece se bater
+        for pipe in pipes:#cria o laço principal dos pipes
+            for bird in birds:
+                if pipe.collide(bird):
+                    pass #adicionar o que acontece se bater
                 
+                if not pipe.passed and pipe.x < bird.x:
+                    pipe.passed = True
+                    add_pipe = True
+            
             if pipe.x + pipe.PIPE_TOP.get_width() < 0:
                 rem.append(pipe)
-                
-            if not pipe.passed and pipe.x < bird.x:
-                pipe.passed = True
-                add_pipe = True
             
             pipe.move()
                 
@@ -223,8 +224,9 @@ def main():
         for r in rem: 
             pipes.remove(r)
         
-        if bird.y + bird.img.get_height() >= 730: #bate no chao
-            pass
+        for bird in birds:
+            if bird.y + bird.img.get_height() >= 730: #bate no chao
+                pass
         
             
         base.move()
