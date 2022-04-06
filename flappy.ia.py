@@ -8,6 +8,7 @@ import random
 WIN_WIDTH = 500
 WIN_HEIGHT = 800
 
+
 #importação das imagens do jogo e rescala o tamanho em 2x
 BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bird1.png'))),
              pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bird2.png'))),
@@ -192,9 +193,33 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        bird.move()
+        #bird.move()
+        add_pipe = False
+        rem = []
+        for pipe in pipes: #cria o laço principal dos pipes
+            if pipe.collide(bird):
+                pass #adicionar o que acontece se bater
+                
+            if pipe.x + pipe.PIPE_TOP.get_width() < 0:
+                rem.append(pipe)
+                
+            if not pipe.passed and pipe.x < bird.x:
+                pipe.passed = True
+                add_pipe = True
+            
+            pipe.move()
+                
+        if add_pipe: #adiciona placar
+            #score += 1
+            pipes.append(Pipe(700))
+            
+        for r in rem:
+            pipes.remove(r)
+            
+        
+            
         base.move()
-        draw_window(win, bird, pipes, base)
+        draw_window(win, bird, pipes, base, )
         
     pygame.quit()
     quit()            
