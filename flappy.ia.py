@@ -187,7 +187,19 @@ def draw_window(win, bird, pipes, base, score):
     pygame.display.update()
  
 def main(genomes, config):
+    nets = []
+    ge= []    
     birds = []
+    
+    for g in genomes:
+        net = neat.nn.FeedForwardNetwork(g, config)
+        nets.append(nets)
+        birds.append(Bird(230, 350))
+        g.fitness = 0
+        ge.append(g)
+        
+        
+        
     base = Base(730)
     pipes = [Pipe(600)] #altera distancia entre os canos
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -200,14 +212,18 @@ def main(genomes, config):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+        
         #bird.move()
         add_pipe = False
         rem = []
         for pipe in pipes:#cria o laço principal dos pipes
-            for bird in birds:
+            for x, bird in enumarete(birds):
                 if pipe.collide(bird):
-                    pass #adicionar o que acontece se bater
-                
+                    ge[x].fitness =- 1 #cada vez que o passaro bate no cano eh expulso
+                    birds.pop(x) 
+                    nets.pop(x)
+                    ge.pop(x)
+                    
                 if not pipe.passed and pipe.x < bird.x:
                     pipe.passed = True
                     add_pipe = True
