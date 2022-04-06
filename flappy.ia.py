@@ -5,7 +5,7 @@ import os
 import random
 
 #tamanho da tela
-WIN_WIDTH = 600
+WIN_WIDTH = 500
 WIN_HEIGHT = 800
 
 #importação das imagens do jogo e rescala o tamanho em 2x
@@ -82,29 +82,35 @@ class Bird:
             self.img_count = self.ANIMATION_TIME*2     
         
         #rotacionar as imagens
-        rotated_image = pygame.transform.rotate(self.img, self.tilt)
-        new_rect = rotated_image.get_rect(center=self.img.get_rect(topleft = (self.x, self.y).center) #ponto central da imagem
-        win.blit(rotated_image, new_rect.topleft)
+        blitRotateCenter(win, self.img, (self.x, self.y), self.tilt)
         
     def get_mask(self):
         return pygame.mask.from_surface(self.img)
-                
- 
+
+#função para rotacionar a imagem              
+def blitRotateCenter(surf, image, topleft, angle):
+    rotated_image = pygame.transform.rotate(image, angle)
+    new_rect = rotated_image.get_rect(center = image.get_rect(topleft = topleft).center)
+
+    surf.blit(rotated_image, new_rect.topleft)
+
 def draw_window(win, bird):
-    win.blit(BG_IMG, (0.0))
+    win.blit(BG_IMG, (0,0))
     bird.draw(win)
     pygame.display.update()
  
 def main():
     bird = Bird(200,200)
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+    clock =pygame.time.Clock()
     
     run = True
     while run:
+        clock.tick(30)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-                
+        bird.move()      
         draw_window(win, bird)
         
     pygame.quit()
