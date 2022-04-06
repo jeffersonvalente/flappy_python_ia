@@ -65,20 +65,20 @@ class Bird:
         self.img_count += 1
         
         #verifica qual imagem usar
-        if self.img_count < self.ANIMATION_TIME:
+        if self.img_count <= self.ANIMATION_TIME:
             self.img = self.IMGS[0]
-        elif self.img_count < self.ANIMATION_TIME*2:
+        elif self.img_count <= self.ANIMATION_TIME*2:
             self.img = self.IMGS[1]
-        elif self.img_count < self.ANIMATION_TIME*3:
-            self.img = self.IMGS[2] 
-        elif self.img_count < self.ANIMATION_TIME*4:
+        elif self.img_count <= self.ANIMATION_TIME*3:
+            self.img = self.IMGS[2]
+        elif self.img_count <= self.ANIMATION_TIME*4:
             self.img = self.IMGS[1]
         elif self.img_count == self.ANIMATION_TIME*4 + 1:
             self.img = self.IMGS[0]
             self.img_count = 0
         
         #garente qeu a imagem do passarinho caindo seja usada ao cair
-        if self.tilt <= 80:
+        if self.tilt <= -80:
             self.img = self.IMGS[1]
             self.img_count = self.ANIMATION_TIME*2     
         
@@ -168,13 +168,21 @@ def blitRotateCenter(surf, image, topleft, angle):
 
     surf.blit(rotated_image, new_rect.topleft)
 
-def draw_window(win, bird):
+def draw_window(win, bird, pipes, base):
     win.blit(BG_IMG, (0,0))
+    
+    for pipe in pipes:
+       pipe.draw(win)
+       
+    base.draw(win)
+        
     bird.draw(win)
     pygame.display.update()
  
 def main():
-    bird = Bird(200,200)
+    bird = Bird(230,350)
+    base = Base(730)
+    pipes = [Pipe(700)]
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     clock =pygame.time.Clock()
     
@@ -184,8 +192,9 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        bird.move()      
-        draw_window(win, bird)
+        bird.move()
+        base.move()
+        draw_window(win, bird, pipes, base)
         
     pygame.quit()
     quit()            
