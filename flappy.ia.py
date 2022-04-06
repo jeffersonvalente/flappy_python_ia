@@ -41,24 +41,25 @@ class Bird:
         
     def move(self):
         self.tick_count += 1
-        
-        #numero de pixels que se movimenta e criando o movimento das imagens
-        d = self.vel*self.tick_count + 1.5*self.tick_count**2
-        
-        if d >= 16:
-            d = 16
-        if d < 0:
-            d -= 2
-    
-        self.y = self.y + d
-        
-        if d < 0 or self.y < self.height + 50:
+
+        # aceleração de queda
+        displacement = self.vel*(self.tick_count) + 0.5*(3)*(self.tick_count)**2  # calculate displacement
+
+        # velocidade do terminal
+        if displacement >= 16:
+            displacement = (displacement/abs(displacement)) * 16
+
+        if displacement < 0:
+            displacement -= 2
+
+        self.y = self.y + displacement
+
+        if displacement < 0 or self.y < self.height + 50:  # tilt up
             if self.tilt < self.MAX_ROTATION:
-             self.tilt = self.MAX_ROTATION   
-            
-            else:
-             if self.tilt > - 90:
-                 self.tilt -= self.ROT_VEL
+                self.tilt = self.MAX_ROTATION
+        else:  #tilt para baixo
+            if self.tilt > -90:
+                self.tilt -= self.ROT_VEL
    
     def draw(self, win):
         self.img_count += 1
