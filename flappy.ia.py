@@ -10,7 +10,7 @@ pygame.font.init()
 WIN_WIDTH = 500
 WIN_HEIGHT = 800
 
-
+gen = 0
 #importação das imagens do jogo e rescala o tamanho em 2x
 BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bird1.png'))),
              pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bird2.png'))),
@@ -172,28 +172,39 @@ def blitRotateCenter(surf, image, topleft, angle):
 
     surf.blit(rotated_image, new_rect.topleft)
 
-def draw_window(win, bird, pipes, base, score):
+def draw_window(win, birds, pipes, base, score, gen, pipe_ind):
+    if gen == 0:
+        gen = 1
     win.blit(BG_IMG, (0,0))
     
     for pipe in pipes:
        pipe.draw(win)
       
     text = STAT_FONT.render("Score: " +str(score), 1,(255,255,255))
-    win.blit(text,(WIN_WIDTH - 10 - text.get_width(), 10)) #
+    win.blit(text,(WIN_WIDTH - 10 - text.get_width(), 10)) 
+    
+    text = STAT_FONT.render('Gen: ' +str(gen), 1,(255,255,255))
+    win.blit(text,(10, 10)) 
+    
+    text = STAT_FONT.render("Alive: " + str(len(birds)),1,(255,255,255))
+    win.blit(text, (10, 50))
     
     base.draw(win)
+    for bird in birds:   
+        bird.draw(win)
         
-    bird.draw(win)
     pygame.display.update()
  
 def main(genomes, config):
+    global gen
+    gen =+ 1
     nets = []
     ge= []    
     birds = []
     
-    for g in genomes:
-        net = neat.nn.FeedForwardNetwork(g, config)
-        nets.append(nets)
+    for _, g in genomes:
+        net = neat.nn.FeedForwardNetwork.create(g, config)
+        nets.append(net)
         birds.append(Bird(230, 350))
         g.fitness = 0
         ge.append(g)
@@ -207,32 +218,36 @@ def main(genomes, config):
     
     score = 0
     run = True
+    
     while run:
         clock.tick(30)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
-                quit()            
+                quit()
+                break
                         
         
         pipe_ind = 0
         if len(birds) > 0:
-            if len(pipes)> 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get._width():
+            if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():
                 pipe_ind = 1
+                
         
         #faz o bichinho se mexer sozinho
         for x, bird in enumerate(birds):
-            bird.move()
             ge[x].fitness += 0.1
+            bird.move()
             
-            output = nets[x].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipes_ind].bottom)))
-            if output > 0.5:
+            output = nets[birds.index(bird)].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
+            if output[0] > 0.5:
                 bird.jump()
         
-
-        add_pipe = False
+        base.move()
+        
         rem = []
+        add_pipe = False
         for pipe in pipes:#cria o laço principal dos pipes
             for x, bird in enumerate(birds):
                 if pipe.collide(bird):
@@ -240,13 +255,14 @@ def main(genomes, config):
                     birds.pop(x) 
                     nets.pop(x)
                     ge.pop(x)
-                    
-                if not pipe.passed and pipe.x < bird.x:
-                    pipe.passed = True
-                    add_pipe = True
             
             if pipe.x + pipe.PIPE_TOP.get_width() < 0:
                 rem.append(pipe)
+                
+            if not pipe.passed and pipe.x < bird.x:
+                pipe.passed = True
+                add_pipe = True
+                
             
             pipe.move()
                 
@@ -267,13 +283,13 @@ def main(genomes, config):
         
             
         base.move()
-        draw_window(win, bird, pipes, base, score)
+        draw_window(win, birds, pipes, base, score, gen, pipe_ind)
            
 
 def run(config_path): #cria a rede que vai treinar
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                         config_path) #chama as propriedades do arquivo
+                         config_path)
     
     #cria a população
     p = neat.Population(config)
@@ -283,9 +299,9 @@ def run(config_path): #cria a rede que vai treinar
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     
-    winner = p.run(,50)
-    
- 
+    winner = p.run(main, 50)
+    print('\nBest genome:\n{!s}'.format(winner))
+  
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
     config_path =os.path.join(local_dir, 'config-feedforward.txt')
