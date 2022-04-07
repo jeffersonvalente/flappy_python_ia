@@ -5,8 +5,12 @@ import os
 import random
 import visualize
 import pickle
+import random
 pygame.font.init()
 
+#dificuldade
+PIMP_VEL = 5
+#PIMP_HEIGHT= random.randrange(45, 550)
 
 #tamanho da tela
 WIN_WIDTH = 600
@@ -45,6 +49,12 @@ class Bird:
         
     def jump(self):
         self.vel = -10.5 #faz subir na tela
+        self.tick_count = 0
+        self.height = self.y
+    
+    #adiciona descida    
+    def down(self):
+        self.vel = +10.5 #faz subir na tela
         self.tick_count = 0
         self.height = self.y
         
@@ -99,8 +109,8 @@ class Bird:
     
 class Pipe: #criando os canos
     GAP = 200
-    VEL = 20 #aumetnar aumenta a dificuldade
-    
+#   VEL = 20 #aumetnar aumenta a dificuldade
+    VEL = PIMP_VEL
     def __init__(self,x):
         self.x = x
         self.height = 0
@@ -115,7 +125,8 @@ class Pipe: #criando os canos
     
     #função do posicionamento dos canos    
     def set_height(self):
-        self.height = random.randrange(45, 650) #aumentar aumeta a dificuldade
+        #self.height = random.randrange(50, 550) #aumentar aumeta a dificuldade
+        self.height = random.randrange(50, 550)
         self.top = self.height - self.PIPE_TOP.get_height()#ajusta o cano no topo
         self.bottom = self.height + self.GAP
     
@@ -256,6 +267,8 @@ def eval_genomes(genomes, config):
             
             if output[0] > 0.5:
                 bird.jump()
+            if output[0] < 0.4:
+                bird.down()
         
         base.move()
         
