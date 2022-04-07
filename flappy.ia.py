@@ -99,7 +99,7 @@ class Bird:
     
 class Pipe: #criando os canos
     GAP = 200
-    VEL = 5
+    VEL = 20 #aumetnar aumenta a dificuldade
     
     def __init__(self,x):
         self.x = x
@@ -115,7 +115,7 @@ class Pipe: #criando os canos
     
     #função do posicionamento dos canos    
     def set_height(self):
-        self.height = random.randrange(50, 450)
+        self.height = random.randrange(45, 650) #aumentar aumeta a dificuldade
         self.top = self.height - self.PIPE_TOP.get_height()#ajusta o cano no topo
         self.bottom = self.height + self.GAP
     
@@ -297,6 +297,9 @@ def eval_genomes(genomes, config):
         
         draw_window(WIN, birds, pipes, base, score, gen, pipe_ind)
         
+        '''if score > 20:
+            pickle.dump(nets[0],open("best.pickle", "wb"))
+            break'''
          
 
 def run(config_path): #cria a rede que vai treinar
@@ -312,8 +315,9 @@ def run(config_path): #cria a rede que vai treinar
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     
-    winner = p.run(eval_genomes, 50)
+    winner = p.run(eval_genomes, 200) #altera o numero gerações
     print('\nBest genome:\n{!s}'.format(winner))
+    
   
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
