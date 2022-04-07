@@ -9,8 +9,8 @@ import random
 pygame.font.init()
 
 #dificuldade
-PIMP_VEL = 5
-#PIMP_HEIGHT= random.randrange(45, 550)
+PIMP_VEL = 10
+#PIMP_HEIGHT= random.randrange(55, 550)
 
 #tamanho da tela
 WIN_WIDTH = 600
@@ -48,15 +48,15 @@ class Bird:
         self.img = self.IMGS[0]
         
     def jump(self):
-        self.vel = -10.5 #faz subir na tela
+        self.vel = -PIMP_VEL #faz subir na tela
         self.tick_count = 0
         self.height = self.y
     
     #adiciona descida    
-    def down(self):
-        self.vel = +10.5 #faz subir na tela
-        self.tick_count = 0
-        self.height = self.y
+    #def down(self):
+    #    self.vel = +(PIMP_VEL*2) #faz subir na tela
+    #    self.tick_count = 0
+    #    self.height = self.y
         
     def move(self):
         self.tick_count += 1
@@ -125,8 +125,8 @@ class Pipe: #criando os canos
     
     #função do posicionamento dos canos    
     def set_height(self):
-        #self.height = random.randrange(50, 550) #aumentar aumeta a dificuldade
-        self.height = random.randrange(50, 550)
+        #self.height = random.randrange(50, 550) #aumentar aumeta a dificuldade MAX 650
+        self.height = random.randrange(75, 550)
         self.top = self.height - self.PIPE_TOP.get_height()#ajusta o cano no topo
         self.bottom = self.height + self.GAP
     
@@ -155,7 +155,7 @@ class Pipe: #criando os canos
         return False
     
 class Base:
-    VEL = 5
+    VEL = PIMP_VEL
     WIDTH = base_img.get_width()
     IMG = base_img
     
@@ -267,8 +267,8 @@ def eval_genomes(genomes, config):
             
             if output[0] > 0.5:
                 bird.jump()
-            if output[0] < 0.4:
-                bird.down()
+            #else:
+            #    bird.down()
         
         base.move()
         
@@ -328,7 +328,7 @@ def run(config_path): #cria a rede que vai treinar
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     
-    winner = p.run(eval_genomes, 200) #altera o numero gerações
+    winner = p.run(eval_genomes, 10000) #altera o numero gerações
     print('\nBest genome:\n{!s}'.format(winner))
     
   
