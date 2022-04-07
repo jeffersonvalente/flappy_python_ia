@@ -212,12 +212,29 @@ def main(genomes, config):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                pygame.quit()
+                quit()            
+                        
         
-        #bird.move()
+        pipe_ind = 0
+        if len(birds) > 0:
+            if len(pipes)> 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get._width():
+                pipe_ind = 1
+        
+        #faz o bichinho se mexer sozinho
+        for x, bird in enumerate(birds):
+            bird.move()
+            ge[x].fitness += 0.1
+            
+            output = nets[x].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipes_ind].bottom)))
+            if output > 0.5:
+                bird.jump()
+        
+
         add_pipe = False
         rem = []
         for pipe in pipes:#cria o laço principal dos pipes
-            for x, bird in enumarete(birds):
+            for x, bird in enumerate(birds):
                 if pipe.collide(bird):
                     ge[x].fitness =- 1 #cada vez que o passaro bate no cano eh expulso
                     birds.pop(x) 
@@ -235,23 +252,23 @@ def main(genomes, config):
                 
         if add_pipe: #adiciona placar
             score += 1
+            for g in ge:
+                g.fitness +=5
             pipes.append(Pipe(600)) #altera distancia entre os canos
             
         for r in rem: 
             pipes.remove(r)
         
-        for bird in birds:
-            if bird.y + bird.img.get_height() >= 730: #bate no chao
-                pass
+        for x, bird in enumerate(birds):
+            if bird.y + bird.img.get_height() >= 730 or bird.y < 0 : #bate no chao
+               birds.pop(x) 
+               nets.pop(x)
+               ge.pop(x)
         
             
         base.move()
         draw_window(win, bird, pipes, base, score)
-        
-    pygame.quit()
-    quit()            
-                
-main()
+           
 
 def run(config_path): #cria a rede que vai treinar
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
