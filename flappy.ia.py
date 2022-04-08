@@ -16,8 +16,8 @@ PIMP_VEL = 10
 WIN_WIDTH = 600
 WIN_HEIGHT = 800
 FLOOR = 730
-STAT_FONT = pygame.font.SysFont("comicsans", 50)
-END_FONT = pygame.font.SysFont("comicsans", 70)
+STAT_FONT = pygame.font.SysFont("comicsans", 40)
+END_FONT = pygame.font.SysFont("comicsans", 60)
 DRAW_LINES = False
 
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -29,6 +29,7 @@ bg_img = pygame.transform.scale(pygame.image.load(os.path.join("imgs","bg.png"))
 bird_images = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","bird" + str(x) + ".png"))) for x in range(1,4)]
 base_img = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","base.png")).convert_alpha())
 gen = 0
+#winner = 0
 
 #classe do passaro
 class Bird:
@@ -215,6 +216,10 @@ def draw_window(win, birds, pipes, base, score, gen, pipe_ind):
     # vivo
     score_label = STAT_FONT.render("Vivo: " + str(len(birds)),1,(255,255,255))
     win.blit(score_label, (10, 50))
+    
+    #melhor
+#    score_label = STAT_FONT.render("Melhor: " + str(len(winner)),1,(255,255,255))
+#    win.blit(score_label, (10, 50))
 
         
     pygame.display.update()
@@ -242,7 +247,7 @@ def eval_genomes(genomes, config):
     run = True
     
     while run and len(birds) > 0:
-        clock.tick(30)
+        clock.tick(120)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
