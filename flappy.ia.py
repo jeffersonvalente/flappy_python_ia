@@ -19,6 +19,7 @@ FLOOR = 730
 STAT_FONT = pygame.font.SysFont("comicsans", 40)
 END_FONT = pygame.font.SysFont("comicsans", 60)
 DRAW_LINES = False
+#melhor = print('\nBest genome:\n{!s}'.format(winner))
 
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.display.set_caption("Flappy IA do Jeffin")
@@ -241,22 +242,25 @@ def eval_genomes(genomes, config):
     base = Base(FLOOR)
     pipes = [Pipe(700)]
     score = 0
-
     clock = pygame.time.Clock()
-
     run = True
+    paused = False
     
     while run and len(birds) > 0:
         clock.tick(120)
-
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
                 quit()
                 break
-                        
-        
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    paused = not paused
+        if paused == True:
+            continue
+                           
         pipe_ind = 0
         if len(birds) > 0:
             if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():
@@ -312,12 +316,14 @@ def eval_genomes(genomes, config):
                 nets.pop(birds.index(bird))
                 ge.pop(birds.index(bird))
                 birds.pop(birds.index(bird))
-        
+                
+                           
         draw_window(WIN, birds, pipes, base, score, gen, pipe_ind)
-        
-        '''if score > 20:
-            pickle.dump(nets[0],open("best.pickle", "wb"))
-            break'''
+        if score > 99:
+            paused = True
+        #if score > 20: #quando o score chega reinicia com o melhor da geração passada
+        #    pickle.dump(nets[0],open("best.pickle", "wb"))
+        #    break
          
 
 def run(config_path): #cria a rede que vai treinar
@@ -333,10 +339,11 @@ def run(config_path): #cria a rede que vai treinar
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     
-    winner = p.run(eval_genomes, 10000) #altera o numero gerações
+    #melhor das gerações
+    winner = p.run(eval_genomes, 10000)#altera o numero gerações
     print('\nBest genome:\n{!s}'.format(winner))
     
-  
+
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
     config_path =os.path.join(local_dir, 'config-feedforward.txt')
